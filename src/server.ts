@@ -8,7 +8,9 @@ app.use(express.json());
 
 app.get("/tasks", (req, res) => {
   const includeDone = req.query.includeDone === "true";
-  res.json(listTasks(store, { includeDone }));
+  const page = req.query.page !== undefined ? Number(req.query.page) : undefined;
+  const limit = req.query.limit !== undefined ? Number(req.query.limit) : undefined;
+  res.json(listTasks(store, { includeDone, page, limit }));
 });
 
 app.post("/tasks", (req, res) => {
