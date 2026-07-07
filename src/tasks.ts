@@ -14,7 +14,17 @@ export function completeTask(store: TaskStore, id: string): Task {
   return task;
 }
 
-export function listTasks(store: TaskStore, opts: { includeDone?: boolean } = {}): Task[] {
+export interface ListOpts {
+  includeDone?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export function listTasks(store: TaskStore, opts: ListOpts = {}): Task[] {
   const all = store.all().sort((a, b) => a.createdAt - b.createdAt);
-  return opts.includeDone ? all : all.filter((t) => !t.done);
+  const visible = opts.includeDone ? all : all.filter((t) => !t.done);
+  if (opts.page === undefined) return visible;
+  const limit = opts.limit ?? 20;
+  const start = opts.page * limit;
+  return visible.slice(start, start + limit);
 }
