@@ -18,3 +18,13 @@ export function listTasks(store: TaskStore, opts: { includeDone?: boolean } = {}
   const all = store.all().sort((a, b) => a.createdAt - b.createdAt);
   return opts.includeDone ? all : all.filter((t) => !t.done);
 }
+
+// Returns tasks whose due date falls within the given window, soonest first,
+// so the UI can surface a "coming up" list.
+export function dueSoon(store: TaskStore, withinMs: number): Task[] {
+  const now = Date.now();
+  return store
+    .all()
+    .filter((t) => t.dueAt !== undefined && t.dueAt - now <= withinMs)
+    .sort((a, b) => (a.dueAt ?? 0) - (b.dueAt ?? 0));
+}

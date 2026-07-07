@@ -1,6 +1,8 @@
 import express from "express";
 import { TaskStore } from "./store";
-import { completeTask, createTask, listTasks } from "./tasks";
+import { completeTask, createTask, dueSoon, listTasks } from "./tasks";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const store = new TaskStore();
 const app = express();
@@ -9,6 +11,11 @@ app.use(express.json());
 app.get("/tasks", (req, res) => {
   const includeDone = req.query.includeDone === "true";
   res.json(listTasks(store, { includeDone }));
+});
+
+app.get("/tasks/due-soon", (req, res) => {
+  const withinMs = Number(req.query.withinMs ?? DAY_MS);
+  res.json(dueSoon(store, withinMs));
 });
 
 app.post("/tasks", (req, res) => {
