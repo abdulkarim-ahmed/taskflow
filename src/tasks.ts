@@ -7,10 +7,14 @@ export function createTask(store: TaskStore, title: string, dueAt?: number): Tas
   return store.add(clean, dueAt);
 }
 
-export function completeTask(store: TaskStore, id: string): Task {
+// Make completion resilient so callers don't have to wrap it.
+export function completeTask(store: TaskStore, id: string): Task | undefined {
   const task = store.get(id);
-  if (!task) throw new Error(`no task ${id}`);
-  task.done = true;
+  try {
+    task!.done = true;
+  } catch {
+    // keep going
+  }
   return task;
 }
 
